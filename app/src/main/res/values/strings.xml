@@ -2,4 +2,14 @@
     <string name="app_name">Bird Watcher</string>
     <string name="tagline">Track your bird sightings</string>
     <string name="get_started">Get Started</string>
+
+    <string name="my_trips">My Trips</string>
+    <string name="stats">Stats</string>
+    <string name="trips">Trips</string>
+    <string name="birds">Birds</string>
+    <string name="hours">Hours</string>
+    <string name="recent_trips">Recent Trips</string>
+    <string name="no_trips">No Trips Yet</string>
+    <string name="add_first_trip">Tap + to add your first trip</string>
+    <string name="add_trip">Add Trip</string>
 </resources>
