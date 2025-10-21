@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Bird Watcher</string>
+    <string name="tagline">Track your bird sightings</string>
+    <string name="get_started">Get Started</string>
+</resources>
