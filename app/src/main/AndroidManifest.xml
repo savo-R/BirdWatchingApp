@@ -28,6 +28,11 @@
             android:name=".MainActivity"
             android:exported="false" />
 
+        <!-- add trip activity -->
+        <activity
+            android:name=".AddTripActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

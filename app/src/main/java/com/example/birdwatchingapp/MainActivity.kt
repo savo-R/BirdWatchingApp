@@ -1,5 +1,6 @@
 package com.example.birdwatchingapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -29,7 +30,8 @@ class MainActivity : AppCompatActivity() {
 
         // fab click
         fabAdd.setOnClickListener {
-            // not implemented yet
+            val intent = Intent(this, AddTripActivity::class.java)
+            startActivity(intent)
         }
     }
 }
