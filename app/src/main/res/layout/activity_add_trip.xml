@@ -143,7 +143,29 @@
                 android:autofillHints="none"
                 android:layout_marginBottom="24dp"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Description"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+
             <!-- save button -->
+
+            <EditText
+                android:id="@+id/etDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edit_text_border"
+                android:gravity="top"
+                android:padding="12dp"
+                android:hint="Trip Description"
+                android:inputType="textMultiLine"
+                android:lines="4" />
+
             <Button
                 android:id="@+id/btnSave"
                 android:layout_width="match_parent"
