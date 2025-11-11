@@ -22,12 +22,18 @@ class AddTripActivity : AppCompatActivity() {
     private lateinit var etDescription: EditText
     private lateinit var btnSave: Button
 
+    // database helper
+    private lateinit var dbHelper: DatabaseHelper
+
     // Calendar for storing selected date and time
     private val calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_trip)
+
+        // initialize database
+        dbHelper = DatabaseHelper(this)
 
         // initialize views
         toolbar = findViewById(R.id.toolbar)
@@ -143,7 +149,6 @@ class AddTripActivity : AppCompatActivity() {
             }
         }
 
-        // ✅ Validate Description
         if (etDescription.text.toString().trim().isEmpty()) {
             etDescription.error = "Description is required"
             isValid = false
@@ -158,17 +163,16 @@ class AddTripActivity : AppCompatActivity() {
         val time = etTime.text.toString().trim()
         val location = etLocation.text.toString().trim()
         val duration = etDuration.text.toString().trim()
-        val description = etDescription.text.toString().trim() // added
+        val description = etDescription.text.toString().trim()
 
-        // Show success message with description
-        Toast.makeText(
-            this,
-            "Trip '$tripName' saved!\nDescription: $description",
-            Toast.LENGTH_LONG
-        ).show()
+        // save to database
+        val result = dbHelper.insertTrip(tripName, date, time, location, duration, description)
 
-        // TODO: Save all database here
-
-        finish()
+        if (result > 0) {
+            Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show()
+            finish()
+        } else {
+            Toast.makeText(this, "Failed to save trip", Toast.LENGTH_SHORT).show()
+        }
     }
 }
