@@ -13,9 +13,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvBirdsCount: TextView
     private lateinit var tvHoursCount: TextView
 
+    // database helper
+    private lateinit var dbHelper: DatabaseHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // initialize database
+        dbHelper = DatabaseHelper(this)
 
         // initialize views
         fabAdd = findViewById(R.id.fabAdd)
@@ -23,15 +29,26 @@ class MainActivity : AppCompatActivity() {
         tvBirdsCount = findViewById(R.id.tvBirdsCount)
         tvHoursCount = findViewById(R.id.tvHoursCount)
 
-        // set initial values
-        tvTripsCount.text = "0"
-        tvBirdsCount.text = "0"
-        tvHoursCount.text = "0"
-
         // fab click
         fabAdd.setOnClickListener {
             val intent = Intent(this, AddTripActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // refresh data when coming back
+        loadStats()
+    }
+
+    private fun loadStats() {
+        // get trip count from database
+        val tripCount = dbHelper.getTripCount()
+
+        // update UI
+        tvTripsCount.text = tripCount.toString()
+        tvBirdsCount.text = "0"
+        tvHoursCount.text = "0"
     }
 }

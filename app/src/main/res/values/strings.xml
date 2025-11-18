@@ -23,5 +23,8 @@
     <string name="location_hint">Enter location</string>
     <string name="duration">Duration</string>
     <string name="duration_hint">Enter duration</string>
+    <string name="duration_hours">Duration (hours)</string>
+    <string name="description">Description</string>
     <string name="save">Save Trip</string>
+    <string name="get_current_location">Get Current Location</string>
 </resources>
