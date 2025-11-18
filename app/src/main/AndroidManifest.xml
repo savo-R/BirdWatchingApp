@@ -39,6 +39,10 @@
             android:name=".AddTripActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".TripDetailsActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
