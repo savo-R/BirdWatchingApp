@@ -39,7 +39,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         """.trimIndent()
 
         db?.execSQL(createTable)
-    }
+}
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         // drop table if exists
@@ -62,6 +62,33 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val result = db.insert(TABLE_TRIPS, null, values)
         db.close()
         return result
+    }
+
+    // get all trips
+    fun getAllTrips(): List<Trip> {
+        val tripList = mutableListOf<Trip>()
+        val db = this.readableDatabase
+        val query = "SELECT * FROM $TABLE_TRIPS ORDER BY $COLUMN_ID DESC"
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val trip = Trip(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
+                    tripName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TRIP_NAME)),
+                    date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE)),
+                    time = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TIME)),
+                    location = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCATION)),
+                    duration = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DURATION)),
+                    description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION))
+                )
+                tripList.add(trip)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return tripList
     }
 
     // get trip count
