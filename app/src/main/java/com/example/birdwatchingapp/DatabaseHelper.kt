@@ -155,4 +155,38 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.close()
         return trip
     }
+
+
+    // get total hours from all trips
+    fun getHoursCount(): Double {
+        val db = this.readableDatabase
+        val query = "SELECT $COLUMN_DURATION FROM $TABLE_TRIPS"
+        val cursor = db.rawQuery(query, null)
+
+        var totalHours = 0.0
+        if (cursor.moveToFirst()) {
+            do {
+                val durationStr = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DURATION))
+                // Parse the duration string to get hours
+                val hours = parseDuration(durationStr)
+                totalHours += hours
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return totalHours
+    }
+
+    // Helper function to parse duration string
+    private fun parseDuration(duration: String): Double {
+        return try {
+// the duration tries to convert the string to a double.
+            // if its something like "2.5hrs" it won't cause its text
+            duration.toDoubleOrNull() ?: 0.0
+        } catch (e: Exception) {
+            0.0
+        }
+    }
+
 }
