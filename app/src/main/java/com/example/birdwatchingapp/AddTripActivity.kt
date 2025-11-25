@@ -450,7 +450,7 @@ class AddTripActivity : AppCompatActivity() {
         val duration = etDuration.text.toString().trim()
         val description = etDescription.text.toString().trim()
 
-        // save to database (unchanged from your peers’ code)
+        // save to database (unchanged from your peersâ€™ code)
         val result = dbHelper.insertTrip(tripName, date, time, location, duration, description)
 
         if (result > 0) {

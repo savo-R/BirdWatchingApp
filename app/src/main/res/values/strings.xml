@@ -29,7 +29,6 @@
     <string name="get_current_location">Get Current Location</string>
     <string name="save">Save Trip</string>
 
-    <!-- Add Bird Sighting Screen -->
     <string name="species_label">Species *</string>
     <string name="enter_custom_species_label">Enter Custom Species *</string>
     <string name="enter_bird_species_hint">Enter bird species name</string>
@@ -42,4 +41,19 @@
     <string name="comments_hint">Add any additional notes…</string>
     <string name="add_bird_button">ADD BIRD</string>
     <string name="cancel_button">Cancel</string>
+
+    <string name="trip_details">Trip Details</string>
+    <string name="edit_trip">Edit Trip</string>
+    <string name="update_trip">Update Trip</string>
+    <string name="delete_trip">Delete Trip</string>
+    <string name="add_bird_sighting">Add Bird Sighting</string>
+    <string name="spotted_birds">Spotted Birds</string>
+    <string name="no_birds_spotted">No birds spotted yet</string>
+    <string name="tap_to_add_bird">Tap the button below to add your first bird sighting</string>
+    <string name="delete_confirmation">Are you sure you want to delete this trip?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="trip_deleted">Trip deleted successfully</string>
+    <string name="quantity">Quantity</string>
+    <string name="spotted_at">Spotted at</string>
 </resources>

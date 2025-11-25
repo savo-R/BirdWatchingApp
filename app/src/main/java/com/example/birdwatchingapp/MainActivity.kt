@@ -62,9 +62,12 @@ class MainActivity : AppCompatActivity() {
         // get trip count from database
         val tripCount = dbHelper.getTripCount()
 
+        // get bird statistics from storage
+        val totalBirds = BirdSightingStorage.getTotalBirdCount()
+
         // update UI
         tvTripsCount.text = tripCount.toString()
-        tvBirdsCount.text = "0"
+        tvBirdsCount.text = totalBirds.toString()
         tvHoursCount.text = "0"
     }
 
@@ -83,8 +86,8 @@ class MainActivity : AppCompatActivity() {
 
             // setup adapter
             adapter = TripAdapter(tripList) { trip ->
-                // navigate to add bird sighting
-                val intent = Intent(this, AddBirdSightingActivity::class.java)
+                // navigate to trip details
+                val intent = Intent(this, TripDetailsActivity::class.java)
                 intent.putExtra("TRIP_ID", trip.id)
                 startActivity(intent)
             }
