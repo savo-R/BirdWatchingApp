@@ -39,7 +39,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         """.trimIndent()
 
         db?.execSQL(createTable)
-}
+    }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         // drop table if exists
@@ -105,5 +105,54 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         db.close()
         return count
+    }
+
+    // delete trip by id
+    fun deleteTrip(tripId: Int): Int {
+        val db = this.writableDatabase
+        val result = db.delete(TABLE_TRIPS, "$COLUMN_ID = ?", arrayOf(tripId.toString()))
+        db.close()
+        return result
+    }
+
+    // update trip
+    fun updateTrip(tripId: Int, tripName: String, date: String, time: String, location: String, duration: String, description: String): Int {
+        val db = this.writableDatabase
+        val values = ContentValues()
+
+        values.put(COLUMN_TRIP_NAME, tripName)
+        values.put(COLUMN_DATE, date)
+        values.put(COLUMN_TIME, time)
+        values.put(COLUMN_LOCATION, location)
+        values.put(COLUMN_DURATION, duration)
+        values.put(COLUMN_DESCRIPTION, description)
+
+        val result = db.update(TABLE_TRIPS, values, "$COLUMN_ID = ?", arrayOf(tripId.toString()))
+        db.close()
+        return result
+    }
+
+    // get single trip by id
+    fun getTripById(tripId: Int): Trip? {
+        val db = this.readableDatabase
+        val query = "SELECT * FROM $TABLE_TRIPS WHERE $COLUMN_ID = ?"
+        val cursor = db.rawQuery(query, arrayOf(tripId.toString()))
+
+        var trip: Trip? = null
+        if (cursor.moveToFirst()) {
+            trip = Trip(
+                id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
+                tripName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TRIP_NAME)),
+                date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE)),
+                time = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TIME)),
+                location = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCATION)),
+                duration = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DURATION)),
+                description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION))
+            )
+        }
+
+        cursor.close()
+        db.close()
+        return trip
     }
 }
