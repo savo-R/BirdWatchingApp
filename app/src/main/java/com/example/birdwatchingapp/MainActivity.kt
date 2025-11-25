@@ -83,8 +83,8 @@ class MainActivity : AppCompatActivity() {
 
             // setup adapter
             adapter = TripAdapter(tripList) { trip ->
-                // navigate to trip details
-                val intent = Intent(this, TripDetailsActivity::class.java)
+                // navigate to add bird sighting
+                val intent = Intent(this, AddBirdSightingActivity::class.java)
                 intent.putExtra("TRIP_ID", trip.id)
                 startActivity(intent)
             }
