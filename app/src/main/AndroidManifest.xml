@@ -43,6 +43,10 @@
             android:name=".TripDetailsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".AddBirdSightingActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
