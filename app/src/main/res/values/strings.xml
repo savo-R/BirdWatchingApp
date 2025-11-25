@@ -28,4 +28,18 @@
     <string name="description">Description</string>
     <string name="get_current_location">Get Current Location</string>
     <string name="save">Save Trip</string>
+
+    <!-- Add Bird Sighting Screen -->
+    <string name="species_label">Species *</string>
+    <string name="enter_custom_species_label">Enter Custom Species *</string>
+    <string name="enter_bird_species_hint">Enter bird species name</string>
+    <string name="quantity_label">Quantity *</string>
+    <string name="quantity_hint">How many?</string>
+    <string name="spot_label">Spot *</string>
+    <string name="spot_hint">Where did you see it?</string>
+    <string name="spot_helper_text">Example: tree, pond, feeder, ground</string>
+    <string name="comments_label">Comments (optional)</string>
+    <string name="comments_hint">Add any additional notes…</string>
+    <string name="add_bird_button">ADD BIRD</string>
+    <string name="cancel_button">Cancel</string>
 </resources>
