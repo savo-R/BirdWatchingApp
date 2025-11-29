@@ -98,12 +98,23 @@ class AddTripActivity : AppCompatActivity() {
         btnSave.setOnClickListener {
             if (validateInputs()) {
                 if (isEditMode) {
-                    updateTripDetails()
+                    showUpdateConfirmation()
                 } else {
                     saveTripDetails()
                 }
             }
         }
+    }
+
+    private fun showUpdateConfirmation() {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.update_trip)
+            .setMessage(R.string.update_confirm_message)
+            .setPositiveButton(R.string.update) { _, _ ->
+                updateTripDetails()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun loadTripData() {
