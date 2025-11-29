@@ -29,31 +29,44 @@
     <string name="get_current_location">Get Current Location</string>
     <string name="save">Save Trip</string>
 
-    <string name="species_label">Species *</string>
-    <string name="enter_custom_species_label">Enter Custom Species *</string>
-    <string name="enter_bird_species_hint">Enter bird species name</string>
-    <string name="quantity_label">Quantity *</string>
-    <string name="quantity_hint">How many?</string>
-    <string name="spot_label">Spot *</string>
-    <string name="spot_hint">Where did you see it?</string>
-    <string name="spot_helper_text">Example: tree, pond, feeder, ground</string>
-    <string name="comments_label">Comments (optional)</string>
-    <string name="comments_hint">Add any additional notes…</string>
-    <string name="add_bird_button">ADD BIRD</string>
-    <string name="cancel_button">Cancel</string>
-
+    <!-- Trip Details strings -->
     <string name="trip_details">Trip Details</string>
     <string name="edit_trip">Edit Trip</string>
-    <string name="update_trip">Update Trip</string>
     <string name="delete_trip">Delete Trip</string>
-    <string name="add_bird_sighting">Add Bird Sighting</string>
-    <string name="spotted_birds">Spotted Birds</string>
-    <string name="no_birds_spotted">No birds spotted yet</string>
-    <string name="tap_to_add_bird">Tap the button below to add your first bird sighting</string>
-    <string name="delete_confirmation">Are you sure you want to delete this trip?</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
+    <string name="update_trip">Update Trip</string>
+    <string name="hours_format">%s hours</string>
+
+    <!-- Bird sightings strings -->
+    <string name="bird_sightings">Bird Sightings</string>
+    <string name="no_birds_yet">No Birds Spotted Yet</string>
+    <string name="add_first_bird">Tap + to add your first bird sighting</string>
+    <string name="add_bird">Add Bird</string>
+
+    <!-- Confirmation messages -->
+    <string name="delete_confirm_message">Are you sure you want to delete this trip? This cannot be undone.</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Toast messages -->
+    <string name="trip_saved">Trip saved successfully</string>
+    <string name="trip_updated">Trip updated successfully</string>
     <string name="trip_deleted">Trip deleted successfully</string>
+    <string name="save_failed">Failed to save trip</string>
+    <string name="update_failed">Failed to update trip</string>
+    <string name="delete_failed">Failed to delete trip</string>
+
+    <!-- Bird sighting form strings -->
+    <string name="species_label">Species</string>
+    <string name="enter_custom_species_label">Enter custom species</string>
+    <string name="enter_bird_species_hint">Enter bird species name</string>
+    <string name="quantity_label">Quantity</string>
+    <string name="quantity_hint">How many did you see?</string>
     <string name="quantity">Quantity</string>
-    <string name="spotted_at">Spotted at</string>
+    <string name="spot_label">Spot</string>
+    <string name="spot_helper_text">Where exactly did you spot this bird?</string>
+    <string name="spot_hint">e.g. Near the lake, On a tree branch</string>
+    <string name="comments_label">Comments</string>
+    <string name="comments_hint">Any additional notes about this sighting</string>
+    <string name="add_bird_button">Add Bird</string>
+    <string name="cancel_button">Cancel</string>
 </resources>

@@ -1,17 +1,18 @@
 package com.example.birdwatchingapp
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
 class TripDetailsActivity : AppCompatActivity() {
 
@@ -22,46 +23,33 @@ class TripDetailsActivity : AppCompatActivity() {
     private lateinit var tvLocation: TextView
     private lateinit var tvDuration: TextView
     private lateinit var tvDescription: TextView
-    private lateinit var btnEditTrip: Button
-    private lateinit var btnDeleteTrip: Button
+    private lateinit var btnEdit: MaterialButton
+    private lateinit var btnDelete: MaterialButton
     private lateinit var recyclerViewBirds: RecyclerView
-    private lateinit var emptyStateBirds: LinearLayout
-    private lateinit var btnAddBirdSighting: Button
+    private lateinit var emptyBirdsState: LinearLayout
+    private lateinit var fabAddBird: ExtendedFloatingActionButton
 
-    // database helper
     private lateinit var dbHelper: DatabaseHelper
-
-    // current trip
-    private var currentTrip: Trip? = null
     private var tripId: Int = -1
-
-    // bird sightings
-    private var birdSightings = mutableListOf<BirdSighting>()
-    private lateinit var birdAdapter: BirdSightingAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trip_details)
 
-        // initialize database
-        dbHelper = DatabaseHelper(this)
-
         // get trip id from intent
         tripId = intent.getIntExtra("TRIP_ID", -1)
 
+        if (tripId == -1) {
+            Toast.makeText(this, "Error loading trip", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        // initialize database
+        dbHelper = DatabaseHelper(this)
+
         // initialize views
-        toolbar = findViewById(R.id.toolbar)
-        tvTripName = findViewById(R.id.tvTripName)
-        tvDate = findViewById(R.id.tvDate)
-        tvTime = findViewById(R.id.tvTime)
-        tvLocation = findViewById(R.id.tvLocation)
-        tvDuration = findViewById(R.id.tvDuration)
-        tvDescription = findViewById(R.id.tvDescription)
-        btnEditTrip = findViewById(R.id.btnEditTrip)
-        btnDeleteTrip = findViewById(R.id.btnDeleteTrip)
-        recyclerViewBirds = findViewById(R.id.recyclerViewBirds)
-        emptyStateBirds = findViewById(R.id.emptyStateBirds)
-        btnAddBirdSighting = findViewById(R.id.btnAddBirdSighting)
+        initViews()
 
         // setup toolbar
         setSupportActionBar(toolbar)
@@ -70,100 +58,104 @@ class TripDetailsActivity : AppCompatActivity() {
             finish()
         }
 
+        // setup button clicks
+        setupClickListeners()
+
+        // load trip data
+        loadTripData()
+    }
+
+    private fun initViews() {
+        toolbar = findViewById(R.id.toolbar)
+        tvTripName = findViewById(R.id.tvTripName)
+        tvDate = findViewById(R.id.tvDate)
+        tvTime = findViewById(R.id.tvTime)
+        tvLocation = findViewById(R.id.tvLocation)
+        tvDuration = findViewById(R.id.tvDuration)
+        tvDescription = findViewById(R.id.tvDescription)
+        btnEdit = findViewById(R.id.btnEdit)
+        btnDelete = findViewById(R.id.btnDelete)
+        recyclerViewBirds = findViewById(R.id.recyclerViewBirds)
+        emptyBirdsState = findViewById(R.id.emptyBirdsState)
+        fabAddBird = findViewById(R.id.fabAddBird)
+
         // setup recyclerview
         recyclerViewBirds.layoutManager = LinearLayoutManager(this)
+    }
 
-        // load trip details
-        loadTripDetails()
-
-        // setup button listeners
-        btnEditTrip.setOnClickListener {
-            // TODO: implement edit trip functionality
-            Toast.makeText(this, "Edit trip feature coming soon", Toast.LENGTH_SHORT).show()
+    private fun setupClickListeners() {
+        // edit button
+        btnEdit.setOnClickListener {
+            editTrip()
         }
 
-        btnDeleteTrip.setOnClickListener {
+        // delete button
+        btnDelete.setOnClickListener {
             showDeleteConfirmation()
         }
 
-        btnAddBirdSighting.setOnClickListener {
-            // navigate to add bird sighting activity
+        // fab for adding birds
+        fabAddBird.setOnClickListener {
             val intent = Intent(this, AddBirdSightingActivity::class.java)
             intent.putExtra("TRIP_ID", tripId)
             startActivity(intent)
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // refresh bird sightings when coming back from add bird activity
-        loadBirdSightings()
-    }
+    private fun loadTripData() {
+        val trip = dbHelper.getTripById(tripId)
 
-    private fun loadTripDetails() {
-        if (tripId == -1) {
-            Toast.makeText(this, "Error loading trip", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
-        // get trip from database
-        currentTrip = dbHelper.getTripById(tripId)
-
-        if (currentTrip == null) {
+        if (trip != null) {
+            tvTripName.text = trip.tripName
+            tvDate.text = trip.date
+            tvTime.text = trip.time
+            tvLocation.text = trip.location
+            tvDuration.text = getString(R.string.hours_format, trip.duration)
+            tvDescription.text = trip.description
+        } else {
             Toast.makeText(this, "Trip not found", Toast.LENGTH_SHORT).show()
             finish()
-            return
         }
 
-        // display trip details
-        tvTripName.text = currentTrip!!.tripName
-        tvDate.text = currentTrip!!.date
-        tvTime.text = currentTrip!!.time
-        tvLocation.text = currentTrip!!.location
-        tvDuration.text = "${currentTrip!!.duration} hours"
-        tvDescription.text = currentTrip!!.description
+        // for now show empty state for birds
+        // this will be updated when bird sighting feature is implemented
+        recyclerViewBirds.visibility = View.GONE
+        emptyBirdsState.visibility = View.VISIBLE
     }
 
-    private fun loadBirdSightings() {
-        // get bird sightings for this trip from storage
-        birdSightings = BirdSightingStorage.getBirdSightingsByTripId(tripId).toMutableList()
-
-        if (birdSightings.isEmpty()) {
-            // show empty state
-            emptyStateBirds.visibility = View.VISIBLE
-            recyclerViewBirds.visibility = View.GONE
-        } else {
-            // show bird list
-            emptyStateBirds.visibility = View.GONE
-            recyclerViewBirds.visibility = View.VISIBLE
-
-            // setup adapter
-            birdAdapter = BirdSightingAdapter(birdSightings)
-            recyclerViewBirds.adapter = birdAdapter
-        }
+    private fun editTrip() {
+        val intent = Intent(this, AddTripActivity::class.java)
+        intent.putExtra("TRIP_ID", tripId)
+        startActivity(intent)
     }
 
     private fun showDeleteConfirmation() {
         AlertDialog.Builder(this)
             .setTitle(R.string.delete_trip)
-            .setMessage(R.string.delete_confirmation)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setMessage(R.string.delete_confirm_message)
+            .setPositiveButton(R.string.delete) { _, _ ->
                 deleteTrip()
             }
-            .setNegativeButton(R.string.no, null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
     private fun deleteTrip() {
-        // delete from database
         val result = dbHelper.deleteTrip(tripId)
 
         if (result > 0) {
             Toast.makeText(this, R.string.trip_deleted, Toast.LENGTH_SHORT).show()
             finish()
         } else {
-            Toast.makeText(this, "Failed to delete trip", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.delete_failed, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // reload data when returning from edit screen
+        if (tripId != -1) {
+            loadTripData()
         }
     }
 }
