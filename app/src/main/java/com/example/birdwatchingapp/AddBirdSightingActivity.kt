@@ -18,6 +18,9 @@ class AddBirdSightingActivity : AppCompatActivity() {
     private lateinit var btnAddBird: Button
     private lateinit var btnCancel: Button
 
+    //database helper
+    private lateinit var databaseHelper: DatabaseHelper
+
     private var tripId: Int = -1
 
     // Bird species list
@@ -46,6 +49,10 @@ class AddBirdSightingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_bird_sighting)
+
+        //Initial database helper
+        databaseHelper = DatabaseHelper(this)
+
 
         // Get trip ID from intent
         tripId = intent.getIntExtra("TRIP_ID", -1)
@@ -145,7 +152,7 @@ class AddBirdSightingActivity : AppCompatActivity() {
             }
         }
 
-        // Comments are optional, no validation needed
+        // Comments needs no validation.
 
         return isValid
     }
@@ -161,8 +168,9 @@ class AddBirdSightingActivity : AppCompatActivity() {
         val quantity = etQuantity.text.toString().toInt()
         val comments = etComments.text.toString().trim()
 
-        // Create bird sighting object with trip ID
-        val birdSighting = BirdSighting(
+
+        // Now saving to database
+        val result = databaseHelper.insertBirdSighting(
             tripId = tripId,
             species = species,
             quantity = quantity,
@@ -170,56 +178,31 @@ class AddBirdSightingActivity : AppCompatActivity() {
             timestamp = System.currentTimeMillis()
         )
 
-        // Add to in-memory storage
-        BirdSightingStorage.addBirdSighting(birdSighting)
-
-        Toast.makeText(
-            this,
-            "Bird sighting added!\n$quantity $species spotted",
-            Toast.LENGTH_LONG
-        ).show()
-
-        // TODO: When database is ready, save to database instead of memory
-        // database.insertBirdSighting(birdSighting)
-
-        finish()
+        if (result != -1L) {
+            // Successfully saved
+            Toast.makeText(
+                this,
+                "Bird sighting saved to database!\n$quantity $species spotted",
+                Toast.LENGTH_LONG
+            ).show()
+            finish()
+        } else {
+            // Error saving
+            Toast.makeText(
+                this,
+                "Error saving bird sighting. Please try again.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 }
 
-// Data class for bird sighting (now includes tripId)
+// Updated BirdSighting data class with id field
 data class BirdSighting(
-    val tripId: Int,  // Links bird sighting to a specific trip
-    val species: String,
-    val quantity: Int,
-    val comments: String,
-    val timestamp: Long
+    val id: Int = 0,          // Database ID (auto-generated)
+    val tripId: Int,          // Links bird sighting to a specific trip
+    val species: String,      // Bird species name
+    val quantity: Int,        // Number of birds spotted
+    val comments: String,     // Optional observation notes
+    val timestamp: Long       // When the sighting was recorded
 )
-
-// Temporary in-memory storage (replace with database later)
-object BirdSightingStorage {
-    private val birdSightings = mutableListOf<BirdSighting>()
-
-    fun addBirdSighting(sighting: BirdSighting) {
-        birdSightings.add(sighting)
-    }
-
-    fun getAllBirdSightings(): List<BirdSighting> {
-        return birdSightings.toList()
-    }
-
-    fun getBirdSightingsByTripId(tripId: Int): List<BirdSighting> {
-        return birdSightings.filter { it.tripId == tripId }
-    }
-
-    fun clearAll() {
-        birdSightings.clear()
-    }
-
-    fun getBirdSightingCount(): Int {
-        return birdSightings.size
-    }
-
-    fun getTotalBirdCount(): Int {
-        return birdSightings.sumOf { it.quantity }
-    }
-}

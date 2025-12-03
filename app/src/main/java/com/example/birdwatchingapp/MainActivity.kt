@@ -61,11 +61,11 @@ class MainActivity : AppCompatActivity() {
     private fun loadStats() {
         // get trip count from database
         val tripCount = dbHelper.getTripCount()
+        // get hours count
         val hoursCount = dbHelper.getHoursCount()
 
-
         // get bird statistics from storage
-        val totalBirds = BirdSightingStorage.getTotalBirdCount()
+        val totalBirds = dbHelper.getTotalBirdCount()
 
         // update UI
         tvTripsCount.text = tripCount.toString()
