@@ -84,8 +84,9 @@
                                 android:textColor="@color/gray"
                                 android:textSize="14sp" />
 
+                            <!-- CHANGED: tvDate → tvTripDate -->
                             <TextView
-                                android:id="@+id/tvDate"
+                                android:id="@+id/tvTripDate"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -108,8 +109,9 @@
                                 android:textColor="@color/gray"
                                 android:textSize="14sp" />
 
+                            <!-- CHANGED: tvTime → tvTripTime -->
                             <TextView
-                                android:id="@+id/tvTime"
+                                android:id="@+id/tvTripTime"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -132,8 +134,9 @@
                                 android:textColor="@color/gray"
                                 android:textSize="14sp" />
 
+                            <!-- CHANGED: tvLocation → tvTripLocation -->
                             <TextView
-                                android:id="@+id/tvLocation"
+                                android:id="@+id/tvTripLocation"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -156,8 +159,9 @@
                                 android:textColor="@color/gray"
                                 android:textSize="14sp" />
 
+                            <!-- CHANGED: tvDuration → tvTripDuration -->
                             <TextView
-                                android:id="@+id/tvDuration"
+                                android:id="@+id/tvTripDuration"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -183,8 +187,9 @@
                             android:layout_marginBottom="8dp" />
 
                         <!-- Description Text -->
+                        <!-- CHANGED: tvDescription → tvTripDescription -->
                         <TextView
-                            android:id="@+id/tvDescription"
+                            android:id="@+id/tvTripDescription"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textColor="@color/black"
@@ -230,11 +235,13 @@
 
                 </LinearLayout>
 
-                <!-- Bird Sightings Section -->
+                <!-- Bird Sightings Section Header -->
+                <!-- NEW: Added tvBirdSightingsCount -->
                 <TextView
+                    android:id="@+id/tvBirdSightingsCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/bird_sightings"
+                    android:text="Bird Sightings (0)"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -248,14 +255,22 @@
                     android:nestedScrollingEnabled="false" />
 
                 <!-- Empty State for Birds -->
+                <!-- CHANGED: emptyBirdsState → emptyStateBirds -->
                 <LinearLayout
-                    android:id="@+id/emptyBirdsState"
+                    android:id="@+id/emptyStateBirds"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
                     android:padding="32dp"
                     android:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🦅"
+                        android:textSize="48sp"
+                        android:layout_marginBottom="8dp" />
 
                     <TextView
                         android:layout_width="wrap_content"

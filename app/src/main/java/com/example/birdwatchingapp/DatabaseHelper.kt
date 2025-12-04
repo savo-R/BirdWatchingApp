@@ -227,6 +227,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return result
     }
 
+
+
+
     // Get all bird sightings
     fun getAllBirdSightings(): List<BirdSighting> {
         val sightingList = mutableListOf<BirdSighting>()
