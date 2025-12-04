@@ -199,7 +199,12 @@ class TripDetailsActivity : AppCompatActivity() {
                     recyclerView.visibility = View.VISIBLE
 
                     // create adapter with bird data
-                    adapter= BirdSightingAdapter(birdSightingsList)
+                    adapter = BirdSightingAdapter(
+                        birdSightingsList,
+                        onItemClick = null, // or add a details click if you want
+                        onEditClick = { bird -> editBirdSighting(bird) },
+                        onDeleteClick = { bird -> confirmDeleteBirdDeletion(bird) }
+                    )
                     recyclerView.adapter = adapter
                 }
             }
@@ -207,6 +212,38 @@ class TripDetailsActivity : AppCompatActivity() {
             // If anything goes wrong, show error message
             e.printStackTrace()
             Toast.makeText(this, "Error loading bird sightings: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Open AddBirdSightingActivity in edit mode
+    private fun editBirdSighting(bird: BirdSighting) {
+        val intent = Intent(this, AddBirdSightingActivity::class.java)
+        intent.putExtra("TRIP_ID", tripId)
+        intent.putExtra("BIRD_ID", bird.id)   // use the correct id field
+        startActivity(intent)
+    }
+
+    // Ask before deleting a bird
+    private fun confirmDeleteBirdDeletion(bird: BirdSighting) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete bird sighting")
+            .setMessage("Delete this sighting of ${bird.species}?")
+            .setPositiveButton("Delete") { _, _ ->
+                deleteBirdSighting(bird)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteBirdSighting(bird: BirdSighting) {
+        // you need a function like this in DatabaseHelper
+        val rows = dbHelper.deleteBirdSighting(bird.id)   // adjust name/field
+
+        if (rows > 0) {
+            Toast.makeText(this, "Bird sighting deleted", Toast.LENGTH_SHORT).show()
+            loadBirdSightings()  // re-query DB and refresh list / count / empty state
+        } else {
+            Toast.makeText(this, "Failed to delete bird sighting", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -226,7 +263,7 @@ class TripDetailsActivity : AppCompatActivity() {
     private fun showDeleteConfirmation() {
         AlertDialog.Builder(this)
             .setTitle("Delete Trip")
-            .setMessage("Are you sure you want to delete this trip?")
+            .setMessage("Are you sure you want to delete this trip? Birds will be also deleted")
             .setPositiveButton("Delete") { _, _ ->
                 deleteTrip()
             }
@@ -234,19 +271,19 @@ class TripDetailsActivity : AppCompatActivity() {
             .show()
     }
 
-// delete trip from database
-// uses cascade delete so all birds sightings
-// for this trip are deleted
+    // Delete the trip and ALL its bird sightings (manual cascade using DatabaseHelper)
     private fun deleteTrip() {
-        val result = dbHelper.deleteTrip(tripId)
+        // Calls our new helper that deletes birds first, then the trip
+        val result = dbHelper.deleteTripWithBirdSightings(tripId)
 
         if (result > 0) {
-            Toast.makeText(this, "Trip deleted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Trip and bird sightings deleted", Toast.LENGTH_SHORT).show()
             finish()
         } else {
             Toast.makeText(this, "Failed to delete trip", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     override fun onResume() {
         super.onResume()

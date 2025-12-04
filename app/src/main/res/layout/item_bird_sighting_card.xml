@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,61 +14,90 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Species Name -->
-        <TextView
-            android:id="@+id/tvSpecies"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Quantity -->
+        <!-- Top Row: Species Name and Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="4dp">
+            android:gravity="center_vertical">
 
+            <!-- Species Name -->
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/tvSpecies"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/quantity"
-                android:textSize="14sp"
-                android:textColor="@color/gray"
-                android:textStyle="bold"
-                android:layout_marginEnd="8dp"/>
+                android:layout_weight="1"
+                android:text="Bald Eagle"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvQuantity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="14sp"
-                android:textColor="@color/black"/>
+            <!-- Edit Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditBird"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="4dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                app:icon="@android:drawable/ic_menu_edit"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@color/black"
+                app:backgroundTint="@color/light_gray" />
+
+            <!-- Delete Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDeleteBird"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                app:icon="@android:drawable/ic_menu_delete"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@android:color/holo_red_dark"
+                app:backgroundTint="@color/light_gray" />
+
         </LinearLayout>
+
+        <!-- Quantity -->
+        <TextView
+            android:id="@+id/tvQuantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quantity: 2"
+            android:textSize="14sp"
+            android:textColor="@color/gray"
+            android:layout_marginTop="8dp"/>
 
         <!-- Comments (Only shown if not empty) -->
         <TextView
             android:id="@+id/tvComments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
+            android:text="Beautiful bird spotted near the lake"
             android:textSize="14sp"
             android:textColor="@color/gray"
             android:layout_marginTop="4dp"
             android:visibility="gone"/>
 
+        <!-- Timestamp -->
         <TextView
             android:id="@+id/tvTimestamp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
+            android:text="Dec 04, 2024 at 10:00 AM"
             android:textSize="12sp"
             android:textColor="@color/gray"
             android:layout_marginTop="8dp"/>
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

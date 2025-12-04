@@ -69,6 +69,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         onCreate(db)
     }
 
+
     // ==================== TRIPS METHODS ====================
 
     // Insert trip
@@ -314,12 +315,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return totalCount
     }
 
-    // Delete bird sighting by id
-    fun deleteBirdSighting(sightingId: Int): Int {
-        val db = this.writableDatabase
-        val result = db.delete(TABLE_BIRD_SIGHTINGS, "$COLUMN_SIGHTING_ID = ?", arrayOf(sightingId.toString()))
-        db.close()
-        return result
+    // Delete a bird sighting
+    fun deleteBirdSighting(id: Int): Int {
+        val db = writableDatabase
+        return db.delete(
+            "bird_sightings",
+            "id = ?",
+            arrayOf(id.toString())
+        )
     }
 
     // Delete all bird sightings for a specific trip
@@ -330,18 +333,53 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return result
     }
 
-    // Update bird sighting
-    fun updateBirdSighting(sightingId: Int, species: String, quantity: Int, comments: String): Int {
+    fun deleteTripWithBirdSightings(tripId: Int): Int {
         val db = this.writableDatabase
-        val values = ContentValues()
 
-        values.put(COLUMN_SPECIES, species)
-        values.put(COLUMN_QUANTITY, quantity)
-        values.put(COLUMN_COMMENTS, comments)
+        db.beginTransaction()
+        return try {
+            // 1) Delete all bird sightings for this trip
+            db.delete(
+                TABLE_BIRD_SIGHTINGS,
+                "$COLUMN_TRIP_ID = ?",
+                arrayOf(tripId.toString())
+            )
 
-        val result = db.update(TABLE_BIRD_SIGHTINGS, values, "$COLUMN_SIGHTING_ID = ?", arrayOf(sightingId.toString()))
-        db.close()
-        return result
+            // 2) then Delete the trip itself
+            val result = db.delete(
+                TABLE_TRIPS,
+                "$COLUMN_ID = ?",
+                arrayOf(tripId.toString())
+            )
+            // 3) Commit transaction
+            db.setTransactionSuccessful()
+            result   // return rows deleted from trips table
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0        // treat as failure
+        } finally {
+            db.endTransaction()
+            db.close()
+        }
+    }
+
+
+    // Update bird sighting
+    fun updateBirdSighting(id: Int, species: String, quantity: Int, comments: String): Int {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("species", species)
+            put("quantity", quantity)
+            put("comments", comments)
+            // timestamp stays the same (original sighting time)
+        }
+
+        return db.update(
+            "bird_sightings",
+            values,
+            "id = ?",
+            arrayOf(id.toString())
+        )
     }
 
     // Get bird sighting by id
