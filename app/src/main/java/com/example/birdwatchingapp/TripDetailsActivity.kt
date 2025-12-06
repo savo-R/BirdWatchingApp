@@ -16,241 +16,113 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 
 class TripDetailsActivity : AppCompatActivity() {
 
-    private lateinit var dbHelper: DatabaseHelper
-    private var tripId: Int = -1
+    private lateinit var toolbar: MaterialToolbar
+    private lateinit var tvTripName: TextView
+    private lateinit var tvDate: TextView
+    private lateinit var tvTime: TextView
+    private lateinit var tvLocation: TextView
+    private lateinit var tvDuration: TextView
+    private lateinit var tvDescription: TextView
+    private lateinit var btnEdit: MaterialButton
+    private lateinit var btnDelete: MaterialButton
+    private lateinit var btnUpload: MaterialButton
+    private lateinit var recyclerViewBirds: RecyclerView
+    private lateinit var emptyBirdsState: LinearLayout
+    private lateinit var fabAddBird: ExtendedFloatingActionButton
 
-    // Bird sighting variables
-    private var birdSightingsList = mutableListOf<BirdSighting>()
-    private var adapter: BirdSightingAdapter? = null
+    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var firebaseHelper: FirebaseHelper
+    private var tripId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trip_details)
 
-        // step 1: Get the trip ID from the intent
-        // The previous activitv(MainActivity)
-        // passes this to tell us which trip to display
         tripId = intent.getIntExtra("TRIP_ID", -1)
 
-        // Step 2: validate trip ID
-        // If tripID is -1, something is wrong- show error & close
         if (tripId == -1) {
             Toast.makeText(this, "Error loading trip", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // Step 3: initialize the database helper
-        // This allows us to query the SQlite database
-        // for trip and bird data
         dbHelper = DatabaseHelper(this)
+        firebaseHelper = FirebaseHelper(dbHelper)
 
-        // Step 4: setup toolbar(back button,title)
-        try {
-            val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-            setSupportActionBar(toolbar)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            toolbar.setNavigationOnClickListener {
-                finish()// close activity and return to previous screen
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        initViews()
 
-        //step 5: setup RecycleView once at startup
-        // prevents issues with recreating the layout, manager
-        //multiple times
-        setupRecyclerView()
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
 
-        // Step 6:setup button click listeners
-        //(edit, delete, add bird)
-        // Setup buttons
         setupClickListeners()
-
-        // step 7: load trip details from
-        // database & display them
         loadTripData()
-
-        // Step 8:
-        // Load bird sightings
-        // from database and display them
-        loadBirdSightings()
     }
 
-    // Scroll and see all birds
-    private fun setupRecyclerView() {
-        try {
-            val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewBirds)
-            recyclerView?.apply {
-                // Set LinearLayoutManager to display items in a vertical list
-                layoutManager = LinearLayoutManager(this@TripDetailsActivity)
+    private fun initViews() {
+        toolbar = findViewById(R.id.toolbar)
+        tvTripName = findViewById(R.id.tvTripName)
+        tvDate = findViewById(R.id.tvDate)
+        tvTime = findViewById(R.id.tvTime)
+        tvLocation = findViewById(R.id.tvLocation)
+        tvDuration = findViewById(R.id.tvDuration)
+        tvDescription = findViewById(R.id.tvDescription)
+        btnEdit = findViewById(R.id.btnEdit)
+        btnDelete = findViewById(R.id.btnDelete)
+        btnUpload = findViewById(R.id.btnUpload)
+        recyclerViewBirds = findViewById(R.id.recyclerViewBirds)
+        emptyBirdsState = findViewById(R.id.emptyBirdsState)
+        fabAddBird = findViewById(R.id.fabAddBird)
 
-                //disable nested scrolling
-                // This allows the parent scrollview to handle scrolling
-                // for all items
-                // without this, RecyclerView only shows 1-2 items
-                // and you can't scroll to see more
-                isNestedScrollingEnabled = false
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        recyclerViewBirds.layoutManager = LinearLayoutManager(this)
     }
-
 
     private fun setupClickListeners() {
-        // Edit button- allows user to modify trip details
-        try {
-            findViewById<MaterialButton>(R.id.btnEdit)?.setOnClickListener {
-                editTrip()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        btnEdit.setOnClickListener { editTrip() }
+        btnDelete.setOnClickListener { showDeleteConfirmation() }
+        btnUpload.setOnClickListener { uploadTrip() }
 
-        // Delete button- removes trip from database
-        try {
-            findViewById<MaterialButton>(R.id.btnDelete)?.setOnClickListener {
-                showDeleteConfirmation()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        // FAB for adding birds
-        //- to add new bird sightings
-        try {
-            findViewById<ExtendedFloatingActionButton>(R.id.fabAddBird)?.setOnClickListener {
-                // create intent to open
-                //AddbirdSightingActivity
-                val intent = Intent(this, AddBirdSightingActivity::class.java)
-
-                //Pass trip ID so the bird gets
-                // associated with this trip
-                intent.putExtra("TRIP_ID", tripId)
-
-                // start the activity
-                //when user saves and returns
-                //onResume() will be called automatically
-                startActivity(intent)
-
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        fabAddBird.setOnClickListener {
+            val intent = Intent(this, AddBirdSightingActivity::class.java)
+            intent.putExtra("TRIP_ID", tripId)
+            startActivity(intent)
         }
     }
 
-
     private fun loadTripData() {
-        //query database for trip with
-        // this ID
         val trip = dbHelper.getTripById(tripId)
 
         if (trip != null) {
-            try {
-                // display trip detials in UI
-                findViewById<TextView>(R.id.tvTripDate)?.text = trip.date
-                findViewById<TextView>(R.id.tvTripTime)?.text = trip.time
-                findViewById<TextView>(R.id.tvTripLocation)?.text = trip.location
-                findViewById<TextView>(R.id.tvTripDuration)?.text = "${trip.duration} hours"
-                findViewById<TextView>(R.id.tvTripDescription)?.text = trip.description
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(this, "Error displaying trip details", Toast.LENGTH_SHORT).show()
-            }
+            tvTripName.text = trip.tripName
+            tvDate.text = trip.date
+            tvTime.text = trip.time
+            tvLocation.text = trip.location
+            tvDuration.text = getString(R.string.hours_format, trip.duration)
+            tvDescription.text = trip.description
         } else {
-            //trip not found in database
-            // show error and close activity
             Toast.makeText(this, "Trip not found", Toast.LENGTH_SHORT).show()
             finish()
-        }
-    }
-
-    private fun loadBirdSightings() {
-        if (tripId == -1) {
             return
         }
 
-        try {
-            //STEP 1: Query database for all bird sightings for THIS specific trip
-            //getBirdSightingsByTripId() returns birds where bird_sightings.trip_id = this tripId
-            //Results are ordered by timestamp DESC (newest first)
-            birdSightingsList = dbHelper.getBirdSightingsByTripId(tripId).toMutableList()
-            //Step 2: get references to UI elements
-            val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewBirds)
-            val emptyState = findViewById<LinearLayout>(R.id.emptyStateBirds)
-            val countTextView = findViewById<TextView>(R.id.tvBirdSightingsCount)
-
-            //step 3: update the count display
-            //shows "bird Sightings","Bird sightings(1)" etc
-            countTextView?.text = "Bird Sightings (${birdSightingsList.size})"
-
-
-            // STEP 4: Show either empty state OR bird list depending on what we have
-            if (recyclerView != null) {
-                if (birdSightingsList.isEmpty()) {
-                    // NO BIRDS: Show empty state message
-                    // This is the "No Birds Spotted Yet" screen with the bird emoji
-                    emptyState?.visibility = View.VISIBLE
-                    recyclerView.visibility = View.GONE
-                } else {
-                    // BIRDS EXIST: Hide empty state and show RecyclerView
-                    emptyState?.visibility = View.GONE
-                    recyclerView.visibility = View.VISIBLE
-
-                    // create adapter with bird data
-                    adapter = BirdSightingAdapter(
-                        birdSightingsList,
-                        onItemClick = null, // or add a details click if you want
-                        onEditClick = { bird -> editBirdSighting(bird) },
-                        onDeleteClick = { bird -> confirmDeleteBirdDeletion(bird) }
-                    )
-                    recyclerView.adapter = adapter
-                }
-            }
-        } catch (e: Exception) {
-            // If anything goes wrong, show error message
-            e.printStackTrace()
-            Toast.makeText(this, "Error loading bird sightings: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
+        // load bird sightings for this trip
+        loadBirdSightings()
     }
 
-    // Open AddBirdSightingActivity in edit mode
-    private fun editBirdSighting(bird: BirdSighting) {
-        val intent = Intent(this, AddBirdSightingActivity::class.java)
-        intent.putExtra("TRIP_ID", tripId)
-        intent.putExtra("BIRD_ID", bird.id)   // use the correct id field
-        startActivity(intent)
-    }
+    private fun loadBirdSightings() {
+        val birdSightings = dbHelper.getBirdSightingsByTripId(tripId)
 
-    // Ask before deleting a bird
-    private fun confirmDeleteBirdDeletion(bird: BirdSighting) {
-        AlertDialog.Builder(this)
-            .setTitle("Delete bird sighting")
-            .setMessage("Delete this sighting of ${bird.species}?")
-            .setPositiveButton("Delete") { _, _ ->
-                deleteBirdSighting(bird)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun deleteBirdSighting(bird: BirdSighting) {
-        // you need a function like this in DatabaseHelper
-        val rows = dbHelper.deleteBirdSighting(bird.id)   // adjust name/field
-
-        if (rows > 0) {
-            Toast.makeText(this, "Bird sighting deleted", Toast.LENGTH_SHORT).show()
-            loadBirdSightings()  // re-query DB and refresh list / count / empty state
+        if (birdSightings.isEmpty()) {
+            recyclerViewBirds.visibility = View.GONE
+            emptyBirdsState.visibility = View.VISIBLE
         } else {
-            Toast.makeText(this, "Failed to delete bird sighting", Toast.LENGTH_SHORT).show()
+            recyclerViewBirds.visibility = View.VISIBLE
+            emptyBirdsState.visibility = View.GONE
+
+            val adapter = BirdSightingAdapter(birdSightings)
+            recyclerViewBirds.adapter = adapter
         }
     }
-
-
-// open AddTripActivity in edit mode
-// passes the trip ID so the activity
-// knows which trip to edit
 
     private fun editTrip() {
         val intent = Intent(this, AddTripActivity::class.java)
@@ -258,39 +130,54 @@ class TripDetailsActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-// show confirmation dialog before deleting the trip
-// to prevent accidental deletions
     private fun showDeleteConfirmation() {
         AlertDialog.Builder(this)
-            .setTitle("Delete Trip")
-            .setMessage("Are you sure you want to delete this trip? Birds will be also deleted")
-            .setPositiveButton("Delete") { _, _ ->
-                deleteTrip()
-            }
-            .setNegativeButton("Cancel", null)
+            .setTitle(R.string.delete_trip)
+            .setMessage(R.string.delete_confirm_message)
+            .setPositiveButton(R.string.delete) { _, _ -> deleteTrip() }
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
-    // Delete the trip and ALL its bird sightings (manual cascade using DatabaseHelper)
     private fun deleteTrip() {
-        // Calls our new helper that deletes birds first, then the trip
-        val result = dbHelper.deleteTripWithBirdSightings(tripId)
+        val result = dbHelper.deleteTrip(tripId)
 
         if (result > 0) {
-            Toast.makeText(this, "Trip and bird sightings deleted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.trip_deleted, Toast.LENGTH_SHORT).show()
             finish()
         } else {
-            Toast.makeText(this, "Failed to delete trip", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.delete_failed, Toast.LENGTH_SHORT).show()
         }
     }
 
+    private fun uploadTrip() {
+        val trip = dbHelper.getTripById(tripId)
+
+        if (trip == null) {
+            Toast.makeText(this, "Trip not found", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        btnUpload.isEnabled = false
+        Toast.makeText(this, "Uploading trip...", Toast.LENGTH_SHORT).show()
+
+        firebaseHelper.uploadTrip(
+            trip = trip,
+            onSuccess = {
+                btnUpload.isEnabled = true
+                Toast.makeText(this, "Trip uploaded successfully", Toast.LENGTH_SHORT).show()
+            },
+            onFailure = { error ->
+                btnUpload.isEnabled = true
+                Toast.makeText(this, "Upload failed: $error", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
 
     override fun onResume() {
         super.onResume()
-        // Reload data when returning from edit screen or adding bird
         if (tripId != -1) {
             loadTripData()
-            loadBirdSightings()
         }
     }
 }

@@ -70,5 +70,12 @@
     <string name="comments_label">Comments</string>
     <string name="comments_hint">Any additional notes about this sighting</string>
     <string name="add_bird_button">Add Bird</string>
+    <string name="add_bird_sighting">Add Bird Sighting</string>
     <string name="cancel_button">Cancel</string>
+
+
+    <!--upload buttons-->
+    <string name="upload_all_trips">Upload All to Cloud</string>
+    <string name="upload_to_cloud">Upload to Cloud</string>
+
 </resources>
