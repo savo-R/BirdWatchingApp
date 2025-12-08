@@ -119,9 +119,39 @@ class TripDetailsActivity : AppCompatActivity() {
             recyclerViewBirds.visibility = View.VISIBLE
             emptyBirdsState.visibility = View.GONE
 
-            val adapter = BirdSightingAdapter(birdSightings)
+            // Pass callbacks for edit and delete
+            val adapter = BirdSightingAdapter(
+                birdSightings = birdSightings,
+                onEditClick = { bird -> editBirdSighting(bird) },
+                onDeleteClick = { bird -> deleteBirdSighting(bird) }
+            )
             recyclerViewBirds.adapter = adapter
         }
+    }
+
+    private fun editBirdSighting(bird: BirdSighting) {
+        // Navigate to AddBirdSightingActivity with bird data for editing
+        val intent = Intent(this, AddBirdSightingActivity::class.java)
+        intent.putExtra("TRIP_ID", tripId)
+        intent.putExtra("BIRD_ID", bird.id)
+        startActivity(intent)
+    }
+
+    private fun deleteBirdSighting(bird: BirdSighting) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Bird Sighting")
+            .setMessage("Delete ${bird.species} sighting?")
+            .setPositiveButton("Delete") { _, _ ->
+                val result = dbHelper.deleteBirdSighting(bird.id)
+                if (result > 0) {
+                    Toast.makeText(this, "Bird sighting deleted", Toast.LENGTH_SHORT).show()
+                    loadBirdSightings() // refresh list
+                } else {
+                    Toast.makeText(this, "Failed to delete", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun editTrip() {
@@ -165,11 +195,11 @@ class TripDetailsActivity : AppCompatActivity() {
             trip = trip,
             onSuccess = {
                 btnUpload.isEnabled = true
-                Toast.makeText(this, "Trip uploaded successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "✓ Trip uploaded to Firebase!", Toast.LENGTH_LONG).show()
             },
             onFailure = { error ->
                 btnUpload.isEnabled = true
-                Toast.makeText(this, "Upload failed: $error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "✗ Upload failed: $error", Toast.LENGTH_LONG).show()
             }
         )
     }
