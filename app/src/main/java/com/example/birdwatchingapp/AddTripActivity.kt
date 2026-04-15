@@ -43,6 +43,10 @@ class AddTripActivity : AppCompatActivity() {
     // Calendar for storing selected date and time
     private val calendar = Calendar.getInstance()
 
+    // edit mode variables
+    private var isEditMode = false
+    private var editTripId = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_trip)
@@ -57,18 +61,29 @@ class AddTripActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.toolbar)
         etTripName = findViewById(R.id.etTripName)
         etDate = findViewById(R.id.etDate)
-        btnGetLocation = findViewById(R.id.btnGetLocation)   // <-- your location button
+        btnGetLocation = findViewById(R.id.btnGetLocation)
         etTime = findViewById(R.id.etTime)
         etLocation = findViewById(R.id.etLocation)
         etDuration = findViewById(R.id.etDuration)
         etDescription = findViewById(R.id.etDescription)
         btnSave = findViewById(R.id.btnSave)
 
+        // check if we are in edit mode
+        editTripId = intent.getIntExtra("TRIP_ID", -1)
+        isEditMode = editTripId != -1
+
         // setup toolbar
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener {
             finish()
+        }
+
+        // setup for edit mode or add mode
+        if (isEditMode) {
+            supportActionBar?.title = getString(R.string.edit_trip)
+            btnSave.text = getString(R.string.update_trip)
+            loadTripData()
         }
 
         // Setup date and time pickers
@@ -82,8 +97,39 @@ class AddTripActivity : AppCompatActivity() {
         // save button click
         btnSave.setOnClickListener {
             if (validateInputs()) {
-                saveTripDetails()
+                if (isEditMode) {
+                    showUpdateConfirmation()
+                } else {
+                    saveTripDetails()
+                }
             }
+        }
+    }
+
+    private fun showUpdateConfirmation() {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(R.string.update_trip)
+            .setMessage(R.string.update_confirm_message)
+            .setPositiveButton(R.string.update) { _, _ ->
+                updateTripDetails()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun loadTripData() {
+        val trip = dbHelper.getTripById(editTripId)
+
+        if (trip != null) {
+            etTripName.setText(trip.tripName)
+            etDate.setText(trip.date)
+            etTime.setText(trip.time)
+            etLocation.setText(trip.location)
+            etDuration.setText(trip.duration)
+            etDescription.setText(trip.description)
+        } else {
+            Toast.makeText(this, "Error loading trip data", Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 
@@ -450,14 +496,33 @@ class AddTripActivity : AppCompatActivity() {
         val duration = etDuration.text.toString().trim()
         val description = etDescription.text.toString().trim()
 
-        // save to database (unchanged from your peers’ code)
+        // save to database
         val result = dbHelper.insertTrip(tripName, date, time, location, duration, description)
 
         if (result > 0) {
-            Toast.makeText(this, "Trip saved successfully", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.trip_saved, Toast.LENGTH_SHORT).show()
             finish()
         } else {
-            Toast.makeText(this, "Failed to save trip", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.save_failed, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun updateTripDetails() {
+        val tripName = etTripName.text.toString().trim()
+        val date = etDate.text.toString().trim()
+        val time = etTime.text.toString().trim()
+        val location = etLocation.text.toString().trim()
+        val duration = etDuration.text.toString().trim()
+        val description = etDescription.text.toString().trim()
+
+        // update in database
+        val result = dbHelper.updateTrip(editTripId, tripName, date, time, location, duration, description)
+
+        if (result > 0) {
+            Toast.makeText(this, R.string.trip_updated, Toast.LENGTH_SHORT).show()
+            finish()
+        } else {
+            Toast.makeText(this, R.string.update_failed, Toast.LENGTH_SHORT).show()
         }
     }
 }

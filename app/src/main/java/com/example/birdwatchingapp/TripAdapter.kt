@@ -1,5 +1,6 @@
 package com.example.birdwatchingapp
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +26,7 @@ class TripAdapter(
         return TripViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: TripViewHolder, position: Int) {
         val trip = trips[position]
 
